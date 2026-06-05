@@ -11,6 +11,9 @@ def clean_text(text):
     #remove url
     text = re.sub(r"http\s+", "", text)
 
+    # remove retweet marker
+    text = re.sub(r"\brt\b", "", text)
+
     #remove mention
     text = re.sub(r"@\w+", "", text)
     text = text.replace("#", "")
