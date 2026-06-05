@@ -12,9 +12,17 @@ while True:
 
     cleaned = clean_text(text)
 
+
+    
+
     vec = vectorizer.transform([cleaned])
+    probs = model.predict_proba(vec)[0]
+    confidence = probs.max()
 
     prediction = model.predict(vec)[0]
 
     print("Prediction:", prediction)
+    print(f"Confidence: {confidence:.2%}")
+
+    
 
