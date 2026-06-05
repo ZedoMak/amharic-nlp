@@ -14,7 +14,7 @@ train["tweet"] = train["tweet"].fillna("")
 
 train["clean_tweet"] = train["tweet"].apply(clean_text)
 
-train = train[train["clean_tweet"].str.len()>0]
+train = train[train["clean_tweet"].str.len()>10]
 
 print("After cleaning: ", train.shape)
 

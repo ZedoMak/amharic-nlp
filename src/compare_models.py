@@ -1,19 +1,17 @@
 import pandas as pd
-import joblib
 
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.svm import LinearSVC
 from sklearn.metrics import accuracy_score
 
-# Load data
 df = pd.read_csv("data/preprocessed_train.csv")
 
 X = df["clean_tweet"]
 y = df["sentiment"]
 
-# Split
 X_train, X_valid, y_train, y_valid = train_test_split(
     X,
     y,
@@ -22,7 +20,6 @@ X_train, X_valid, y_train, y_valid = train_test_split(
     stratify=y
 )
 
-# Vectorize
 vectorizer = TfidfVectorizer(
     max_features=10000,
     ngram_range=(1, 2),
@@ -32,26 +29,31 @@ vectorizer = TfidfVectorizer(
 X_train_vec = vectorizer.fit_transform(X_train)
 X_valid_vec = vectorizer.transform(X_valid)
 
-# Train model
-model = LogisticRegression(
-    max_iter=1000,
-    class_weight="balanced"
-)
+models = {
+    "Logistic Regression":
+        LogisticRegression(
+            max_iter=1000,
+            class_weight="balanced"
+        ),
 
-model.fit(X_train_vec, y_train)
+    "Naive Bayes":
+        MultinomialNB(),
 
-# Predict
-preds = model.predict(X_valid_vec)
+    "Linear SVM":
+        LinearSVC(
+            class_weight="balanced"
+        )
+}
 
-# Evaluate
-print("Accuracy:")
-print(accuracy_score(y_valid, preds))
+for name, model in models.items():
 
-print("\nClassification Report:")
-print(classification_report(y_valid, preds))
+    model.fit(X_train_vec, y_train)
 
-# Save model
-joblib.dump(model, "models/logistic_model.pkl")
-joblib.dump(vectorizer, "models/tfidf.pkl")
+    preds = model.predict(X_valid_vec)
 
-print("\nModel saved.")
+    acc = accuracy_score(
+        y_valid,
+        preds
+    )
+
+    print(f"{name}: {acc:.4f}")
